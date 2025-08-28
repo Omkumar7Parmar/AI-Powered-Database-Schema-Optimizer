@@ -1,11 +1,11 @@
 import os
 import json
-import uuid  # <-- THE MISSING IMPORT
+import uuid  
 from fastapi import FastAPI, HTTPException
 from models import FullProcessRequest, IR, DDLBundle
 import google.generativeai as genai
 
-# --- Configuration ---
+
 app = FastAPI(title="AI-Powered Database Schema Optimizer", version="2.1.1") # Final version
 try:
     genai.configure(api_key=os.environ.get("GOOGLE_API_KEY"))
@@ -13,7 +13,7 @@ try:
 except Exception as e:
     model = None
 
-# --- Core Logic Functions ---
+
 def parse_text_to_ir(text: str) -> IR:
     prompt = f"""
     You are an expert database architect. Analyze the following user requirements and extract the database schema as a single, minified JSON object with no markdown.
@@ -51,7 +51,7 @@ def generate_ddl_from_ir(ir: IR) -> DDLBundle:
             junctions.append(f"CREATE TABLE {j_table} (\n    {fk1} INTEGER REFERENCES {from_table}(id),\n    {fk2} INTEGER REFERENCES {to_table}(id),\n    PRIMARY KEY ({fk1}, {fk2})\n);")
     return DDLBundle(tables=tables, junctions=junctions, foreign_keys=foreign_keys, plan_id=f"plan_{uuid.uuid4()}")
 
-# --- API Endpoints ---
+#API Endpoints
 @app.get("/health", tags=["System"])
 def get_health():
     if not model: raise HTTPException(status_code=503, detail="Generative AI model is not configured.")
