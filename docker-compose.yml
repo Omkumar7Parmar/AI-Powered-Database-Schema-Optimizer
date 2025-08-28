@@ -10,7 +10,7 @@ services:
       - .:/app
     # ADD THIS ENVIRONMENT SECTION
     environment:
-      - GOOGLE_API_KEY=AIzaSyCcfcfbHUe8PUZwHSE-ypM-3pb7PseGNos
+      - GOOGLE_API_KEY=your key
     depends_on:
       - db
     restart: unless-stopped
