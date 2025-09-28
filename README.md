@@ -1,5 +1,5 @@
 AI-Powered Database Schema Optimizer
-[cite_start]An intelligent system that ingests natural-language descriptions of data and business rules and generates a complete, optimized, and normalized SQL database schema. This project leverages a powerful generative AI to understand complex requirements and translate them into a concrete, ready-to-use DDL (Data Definition Language) script.
+An intelligent system that ingests natural-language descriptions of data and business rules and generates a complete, optimized, and normalized SQL database schema. This project leverages a powerful generative AI to understand complex requirements and translate them into a concrete, ready-to-use DDL (Data Definition Language) script.
 Features
  * Natural Language Processing: Directly converts plain English sentences into a structured database plan.
  * Schema Synthesis: Automatically generates CREATE TABLE statements for all identified entities and their attributes.
