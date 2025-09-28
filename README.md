@@ -1,84 +1,87 @@
-# AI-Powered Database Schema Optimizer
+```markdown
+# 🧠 AI-Powered Database Schema Optimizer
 
-## Overview
-An intelligent system that ingests natural-language descriptions of data and business rules and generates a complete, optimized, and normalized SQL database schema. This project leverages Google's Gemini AI model to understand complex requirements and translate them into concrete, ready-to-use DDL (Data Definition Language) scripts.
+An intelligent system that transforms human-written descriptions of data and business logic into fully optimized, normalized SQL database schemas. By leveraging generative AI (Google Gemini 1.5 Flash), this tool understands plain language requirements and delivers production-ready DDL scripts.
 
-## Features
-- **Natural Language Processing**: Converts plain English descriptions into structured database schemas
-- **Automatic Schema Generation**: Creates complete CREATE TABLE statements with proper data types
-- **Relationship Inference**: Identifies 1:1, 1:N, and N:M relationships, generating appropriate foreign keys and junction tables
-- **RESTful API**: Clean FastAPI interface for easy integration
-- **Containerized**: Docker-based deployment for consistent environments
+---
 
-## Tech Stack
-- **Backend**: Python 3.11 with FastAPI
-- **AI Model**: Google Gemini 1.5 Flash
-- **Database**: PostgreSQL (for testing)
+## 🚀 Features
+
+- **Natural Language to Schema**: Translate business rules and entity relationships from plain English to SQL.
+- **Schema Synthesis**: Generates `CREATE TABLE` statements with appropriate columns and data types.
+- **Relationship Inference**: Detects `1:N` and `N:M` relationships and creates foreign keys or junction tables accordingly.
+- **AI-Powered Understanding**: Uses Gemini for deep, contextual interpretation of user input.
+- **FastAPI Backend**: Modern and interactive API layer built with Python and FastAPI.
+- **Containerized Setup**: Easily deployable using Docker and Docker Compose.
+
+---
+
+## 🧱 Tech Stack
+
+- **Backend**: Python 3.11+, FastAPI
+- **AI/NLP**: Google Gemini 1.5 Flash
+- **Database**: PostgreSQL (Dockerized for sandbox)
 - **Containerization**: Docker & Docker Compose
 
-## Architecture
-The system follows a simple pipeline:
-1. Receives natural language input via API
-2. Processes text through Gemini AI to extract entities and relationships
-3. Generates normalized SQL schema with proper constraints
-4. Returns complete DDL bundle ready for execution
+---
 
-## Installation
+## ⚙️ Getting Started
 
-### Prerequisites
-- Docker Desktop installed and running
-- Google AI API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+Follow the steps below to spin up the environment locally.
 
-### Setup Steps
+### 1. Prerequisites
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd ai-db-optimizer
-   ```
+- Docker & Docker Compose
+- Google Generative AI API key (get from [Google AI Studio](https://makersuite.google.com/))
 
-2. **Configure environment**
-   Create `.env` file in project root:
-   ```
-   GOOGLE_API_KEY=your_actual_api_key_here
-   ```
+### 2. Clone the Repository
 
-3. **Update docker-compose.yml**
-   Replace the placeholder API key in the environment section:
-   ```yaml
-   environment:
-     - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-   ```
-
-4. **Launch the application**
-   ```bash
-   docker compose up --build
-   ```
-
-5. **Verify installation**
-   Navigate to `http://localhost:8000/docs` to access the interactive API documentation
-
-## API Usage
-
-### Health Check
 ```bash
-GET /health
-```
-Verifies the service and AI model are properly configured.
-
-### Process Text to Schema
-```bash
-POST /process
+git clone <your-repository-url>
+cd ai-db-optimizer
 ```
 
-**Request Body:**
+### 3. Set Up Environment Variables
+
+Create a `.env` file in the root directory:
+
+```
+GOOGLE_API_KEY=YOUR_API_KEY_HERE
+```
+
+Make sure `.env` is added to `.gitignore`.
+
+### 4. Run the Application
+
+```bash
+docker compose up --build
+```
+
+This will build everything and start:
+
+- FastAPI app (at `http://localhost:8000`)
+- PostgreSQL database
+
+---
+
+## 🔍 Usage
+
+### Primary Endpoint
+
+**`POST /process`**
+
+Sends natural language input and receives an auto-generated SQL schema.
+
+#### Request Body
+
 ```json
 {
-  "text": "A Customer places many Orders. An Order contains many Products. Products have name and price."
+  "text": "A Customer places many Orders. An Order can contain many Products, and a Product can be in many Orders. A Product has a name and a price."
 }
 ```
 
-**Response:**
+#### Response
+
 ```json
 {
   "tables": [
@@ -92,97 +95,45 @@ POST /process
   "foreign_keys": [
     "ALTER TABLE orders ADD COLUMN customer_id INTEGER REFERENCES customers(id);"
   ],
-  "plan_id": "plan_uuid"
+  "plan_id": "plan_xxx..."
 }
 ```
 
-## How It Works
+Explore and test via FastAPI Swagger docs at:  
+**`http://localhost:8000/docs`**
 
-### 1. Text Analysis
-The system uses Gemini AI to parse natural language and extract:
-- **Entities**: Business objects (Customer, Order, Product)
-- **Attributes**: Properties of entities (name, price)
-- **Relationships**: Connections between entities with cardinality
+---
 
-### 2. Schema Generation
-Based on the extracted information:
-- Creates tables with appropriate columns and data types
-- Adds primary keys to all tables
-- Generates foreign keys for 1:N relationships
-- Creates junction tables for N:M relationships
+## 📦 Project Structure
 
-### 3. Data Type Inference
-- Attributes containing "price" → `DECIMAL(10, 2)`
-- All other attributes → `VARCHAR(255)`
-- Primary keys → `SERIAL PRIMARY KEY`
-- Foreign keys → `INTEGER REFERENCES`
-
-## Example Use Cases
-
-### E-commerce System
 ```
-Input: "Customers have email and name. They place Orders with order_date. Orders contain Products with name, price, and description. Products belong to Categories with name."
-
-Output: Complete schema with customers, orders, products, categories tables and appropriate relationships.
-```
-
-### Blog Platform
-```
-Input: "Users write Posts with title and content. Posts have many Comments with text. Users can like many Posts."
-
-Output: Schema with users, posts, comments tables plus a user_post_likes junction table.
-```
-
-## Project Structure
-```
-ai-db-optimizer/
-├── main.py              # FastAPI application and core logic
-├── models.py            # Pydantic models for validation
+.
+├── main.py              # FastAPI application
+├── models.py            # Pydantic data models
+├── Dockerfile           # Application Docker image
+├── docker-compose.yml   # Docker Compose setup
 ├── requirements.txt     # Python dependencies
-├── Dockerfile          # Container configuration
-├── docker-compose.yml  # Multi-container orchestration
-└── .env               # Environment variables (create this)
+└── .env                 # API key (not checked into version control)
 ```
 
-## Development
+---
 
-### Running Locally
-```bash
-# Install dependencies
-pip install -r requirements.txt
+## 🔮 Future Work
 
-# Set environment variable
-export GOOGLE_API_KEY=your_key
+- **Schema Execution**: Add endpoint to apply schema directly to a connected DB.
+- **Query & Index Generation**: Auto-create CRUD operations and recommend indexes.
+- **Migration Scripts**: Generate safe DDL migrations based on updated input.
 
-# Run the application
-uvicorn main:app --reload
+---
+
+## ✅ Health Check
+
+**GET `/health`**  
+Returns `{"status": "ok"}` if model is properly configured and running.
+
+---
+
+## 📖 License
+
+This project is open-source and licensed under the MIT License.
 ```
-
-### Adding New Features
-1. Extend the IR model in `models.py` for additional metadata
-2. Enhance the prompt in `parse_text_to_ir()` for better extraction
-3. Modify `generate_ddl_from_ir()` to support new SQL features
-
-## Troubleshooting
-
-### Common Issues
-- **503 Service Unavailable**: Check if GOOGLE_API_KEY is properly set
-- **JSON Parse Error**: The AI response may be malformed; try rephrasing the input
-- **Missing Relationships**: Be explicit about connections between entities
-
-### Debug Mode
-View container logs:
-```bash
-docker compose logs -f api
-```
-
-## Future Enhancements
-- Schema migration support
-- Index recommendation engine
-- Query generation from natural language
-- Support for multiple database dialects
-- Schema visualization
-- Data validation rules extraction
-
-## License
-This project is open source and available under the MIT License.
