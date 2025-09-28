@@ -1,78 +1,69 @@
 ```markdown
 # 🧠 AI-Powered Database Schema Optimizer
 
-An intelligent system that transforms human-written descriptions of data and business logic into fully optimized, normalized SQL database schemas. By leveraging generative AI (Google Gemini 1.5 Flash), this tool understands plain language requirements and delivers production-ready DDL scripts.
+A smart backend system that converts plain English descriptions of entities, business logic, and data structures into a fully normalized SQL schema using advanced generative AI. Just describe your data needs — the system does the rest.
 
 ---
 
 ## 🚀 Features
 
-- **Natural Language to Schema**: Translate business rules and entity relationships from plain English to SQL.
-- **Schema Synthesis**: Generates `CREATE TABLE` statements with appropriate columns and data types.
-- **Relationship Inference**: Detects `1:N` and `N:M` relationships and creates foreign keys or junction tables accordingly.
-- **AI-Powered Understanding**: Uses Gemini for deep, contextual interpretation of user input.
-- **FastAPI Backend**: Modern and interactive API layer built with Python and FastAPI.
-- **Containerized Setup**: Easily deployable using Docker and Docker Compose.
+- 📄 **Natural Language Input** — Write your schema requirements in plain English.
+- ♻️ **Schema Generation** — Automatically builds tables, attributes, foreign keys, and junction tables.
+- 🔗 **Relationship Detection** — Handles 1:1, 1:N, and N:M cardinalities with correct constraints.
+- 🤖 **AI Models Powered by Gemini 1.5 Flash** — Ensures highly accurate interpretation.
+- ⚡ **FastAPI Application** — Clean, fast REST API with full Swagger docs.
+- 📦 **Dockerized Setup** — One-command launch with Docker & Docker Compose.
 
 ---
 
-## 🧱 Tech Stack
+## 🧠 How it Works
 
-- **Backend**: Python 3.11+, FastAPI
-- **AI/NLP**: Google Gemini 1.5 Flash
-- **Database**: PostgreSQL (Dockerized for sandbox)
-- **Containerization**: Docker & Docker Compose
+1. ✍️ **User Input** – You provide the schema description using natural language.
+2. 🧠 **AI Interpretation** – Google Gemini model extracts entities, attributes, and relationships.
+3. 🛠️ **Schema Planning** – Translates the plan into fully normalized DDL.
+4. 📤 **API Output** – Returns the complete SQL script as JSON.
 
 ---
 
-## ⚙️ Getting Started
+## 📦 Installation
 
-Follow the steps below to spin up the environment locally.
-
-### 1. Prerequisites
-
-- Docker & Docker Compose
-- Google Generative AI API key (get from [Google AI Studio](https://makersuite.google.com/))
-
-### 2. Clone the Repository
+### 1. Clone the repository
 
 ```bash
-git clone <your-repository-url>
+git clone <your-repo-url>
 cd ai-db-optimizer
 ```
 
-### 3. Set Up Environment Variables
+### 2. Add your API key
 
 Create a `.env` file in the root directory:
 
 ```
-GOOGLE_API_KEY=YOUR_API_KEY_HERE
+GOOGLE_API_KEY=your_google_api_key_here
 ```
 
-Make sure `.env` is added to `.gitignore`.
+Make sure `.env` is excluded in your `.gitignore`.
 
-### 4. Run the Application
+### 3. Launch the app
 
 ```bash
 docker compose up --build
 ```
 
-This will build everything and start:
-
-- FastAPI app (at `http://localhost:8000`)
-- PostgreSQL database
+This will:
+- Start the FastAPI server
+- Connect a PostgreSQL database
+- Expose the API at `http://localhost:8000`
 
 ---
 
-## 🔍 Usage
+## 🎯 Usage
 
-### Primary Endpoint
+Send a request to the `/process` endpoint:
 
-**`POST /process`**
+### POST /process
 
-Sends natural language input and receives an auto-generated SQL schema.
-
-#### Request Body
+#### Example Input
 
 ```json
 {
@@ -80,7 +71,7 @@ Sends natural language input and receives an auto-generated SQL schema.
 }
 ```
 
-#### Response
+#### Example Output
 
 ```json
 {
@@ -95,45 +86,58 @@ Sends natural language input and receives an auto-generated SQL schema.
   "foreign_keys": [
     "ALTER TABLE orders ADD COLUMN customer_id INTEGER REFERENCES customers(id);"
   ],
-  "plan_id": "plan_xxx..."
+  "plan_id": "plan_xyz123"
 }
 ```
 
-Explore and test via FastAPI Swagger docs at:  
-**`http://localhost:8000/docs`**
+You can also access interactive Swagger docs here:  
+📄 `http://localhost:8000/docs`
 
 ---
 
-## 📦 Project Structure
+## 🔌 API Reference
+
+| Method | Endpoint    | Description                     |
+|--------|-------------|---------------------------------|
+| GET    | `/health`   | API health status               |
+| POST   | `/process`  | Translate text to SQL schema    |
+
+---
+
+## 🧱 Project Structure
 
 ```
 .
-├── main.py              # FastAPI application
-├── models.py            # Pydantic data models
-├── Dockerfile           # Application Docker image
-├── docker-compose.yml   # Docker Compose setup
-├── requirements.txt     # Python dependencies
-└── .env                 # API key (not checked into version control)
+├── main.py               # FastAPI app with endpoints
+├── models.py             # Request/response schema models
+├── Dockerfile            # Application container config
+├── docker-compose.yml    # Multi-service orchestration
+├── requirements.txt      # Python dependencies
+└── .env                  # Your Gemini API key
 ```
 
 ---
 
-## 🔮 Future Work
+## 🔮 Future Improvements
 
-- **Schema Execution**: Add endpoint to apply schema directly to a connected DB.
-- **Query & Index Generation**: Auto-create CRUD operations and recommend indexes.
-- **Migration Scripts**: Generate safe DDL migrations based on updated input.
+- 🧪 **/schema/apply Endpoint** — Execute the generated schema directly into a sandbox database
+- ⚙️ **Query Generation** — Auto-create common queries (SELECT/INSERT/UPDATE)
+- 🚀 **Index Recommendation** — Suggest primary keys and performance indexes
+- 📈 **Schema Migrations** — Safely alter existing database state on new input
 
 ---
 
 ## ✅ Health Check
 
-**GET `/health`**  
-Returns `{"status": "ok"}` if model is properly configured and running.
+Use `/health` to verify readiness:
+
+```json
+{ "status": "ok" }
+```
 
 ---
 
-## 📖 License
+## 🧾 License
 
-This project is open-source and licensed under the MIT License.
+MIT License — use freely, improve collaboratively.
 ```
