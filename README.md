@@ -1,52 +1,85 @@
-AI-Powered Database Schema Optimizer
-An intelligent system that ingests natural-language descriptions of data and business rules and generates a complete, optimized, and normalized SQL database schema. This project leverages a powerful generative AI to understand complex requirements and translate them into a concrete, ready-to-use DDL (Data Definition Language) script.
-Features
- * Natural Language Processing: Directly converts plain English sentences into a structured database plan.
- * Schema Synthesis: Automatically generates CREATE TABLE statements for all identified entities and their attributes.
- * Relationship Modeling: Correctly infers one-to-many (1:N) and many-to-many (N:M) relationships, generating foreign keys and junction tables as needed.
- * AI-Powered: Uses Google's Gemini model for state-of-the-art language understanding, ensuring high accuracy.
- * API-Driven: The entire workflow is exposed via a clean, modern FastAPI application.
- * Containerized: The complete application and its database dependency are managed by Docker and Docker Compose for easy, one-command setup.
-Tech Stack & Architecture
- * Backend: Python 3.11+ with FastAPI
- * AI / NLP: Google Generative AI (Gemini 1.5 Flash)
- * Containerization: Docker & Docker Compose
- * Database (Sandbox): PostgreSQL
-The system is designed as a single API service that receives a request, communicates with the Google AI API to create a structured plan, and then uses that plan to generate the final SQL schema.
-Getting Started
-Follow these steps to get the project running on your local machine.
-Prerequisites
- * Docker Desktop: Make sure it is installed and running on your system.
- * Google AI API Key: You need a valid API key from Google AI Studio.
-Installation & Setup
- * Clone the Repository
-   git clone <your-repository-url>
-cd ai-db-optimizer
+# AI-Powered Database Schema Optimizer
 
- * Create the Environment File
-   Create a file named .env in the root of the project directory and add your API key:
-   GOOGLE_API_KEY=PASTE_YOUR_API_KEY_HERE
+## Overview
+An intelligent system that ingests natural-language descriptions of data and business rules and generates a complete, optimized, and normalized SQL database schema. This project leverages Google's Gemini AI model to understand complex requirements and translate them into concrete, ready-to-use DDL (Data Definition Language) scripts.
 
-   Note: Remember to add .env to your .gitignore file to protect your key.
- * Build and Run the Application
-   From the root of the project directory, run the following command:
+## Features
+- **Natural Language Processing**: Converts plain English descriptions into structured database schemas
+- **Automatic Schema Generation**: Creates complete CREATE TABLE statements with proper data types
+- **Relationship Inference**: Identifies 1:1, 1:N, and N:M relationships, generating appropriate foreign keys and junction tables
+- **RESTful API**: Clean FastAPI interface for easy integration
+- **Containerized**: Docker-based deployment for consistent environments
+
+## Tech Stack
+- **Backend**: Python 3.11 with FastAPI
+- **AI Model**: Google Gemini 1.5 Flash
+- **Database**: PostgreSQL (for testing)
+- **Containerization**: Docker & Docker Compose
+
+## Architecture
+The system follows a simple pipeline:
+1. Receives natural language input via API
+2. Processes text through Gemini AI to extract entities and relationships
+3. Generates normalized SQL schema with proper constraints
+4. Returns complete DDL bundle ready for execution
+
+## Installation
+
+### Prerequisites
+- Docker Desktop installed and running
+- Google AI API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+
+### Setup Steps
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd ai-db-optimizer
+   ```
+
+2. **Configure environment**
+   Create `.env` file in project root:
+   ```
+   GOOGLE_API_KEY=your_actual_api_key_here
+   ```
+
+3. **Update docker-compose.yml**
+   Replace the placeholder API key in the environment section:
+   ```yaml
+   environment:
+     - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+   ```
+
+4. **Launch the application**
+   ```bash
    docker compose up --build
+   ```
 
-   This will build the Docker image, download all dependencies, and start the API and database containers.
- * Verify Setup
-   Once the containers are running, open your web browser and navigate to http://localhost:8000/docs. You should see the FastAPI interactive documentation.
-Usage
-The primary way to use the application is through the /process endpoint. This endpoint handles the entire workflow from text to SQL in a single call.
-Example Request
-You can use the interactive documentation or a tool like cURL to send a request.
-Endpoint: POST /process
-Request Body:
+5. **Verify installation**
+   Navigate to `http://localhost:8000/docs` to access the interactive API documentation
+
+## API Usage
+
+### Health Check
+```bash
+GET /health
+```
+Verifies the service and AI model are properly configured.
+
+### Process Text to Schema
+```bash
+POST /process
+```
+
+**Request Body:**
+```json
 {
-  "text": "A Customer places many Orders. An Order can contain many Products, and a Product can be in many Orders. A Product has a name and a price."
+  "text": "A Customer places many Orders. An Order contains many Products. Products have name and price."
 }
+```
 
-Example Successful Response
-A successful request will return a 200 OK status with the complete DDL bundle in the response body:
+**Response:**
+```json
 {
   "tables": [
     "CREATE TABLE customers (\n    id SERIAL PRIMARY KEY\n);",
@@ -59,11 +92,97 @@ A successful request will return a 200 OK status with the complete DDL bundle in
   "foreign_keys": [
     "ALTER TABLE orders ADD COLUMN customer_id INTEGER REFERENCES customers(id);"
   ],
-  "plan_id": "plan_..."
+  "plan_id": "plan_uuid"
 }
+```
 
-Future Work
-This project has successfully implemented the core AI and schema generation logic. The next steps to expand it into a fully production-ready system would include:
- * Schema Execution: Implementing an endpoint (/schema/apply) to safely execute the generated DDL against a target database.
- * Query & Index Generation: Building the logic to automatically generate sample CRUD queries and recommend optimal database indexes.
- * Advanced Migrations: Adding support for generating safe migration scripts to alter an existing database schema based on new requirements.
+## How It Works
+
+### 1. Text Analysis
+The system uses Gemini AI to parse natural language and extract:
+- **Entities**: Business objects (Customer, Order, Product)
+- **Attributes**: Properties of entities (name, price)
+- **Relationships**: Connections between entities with cardinality
+
+### 2. Schema Generation
+Based on the extracted information:
+- Creates tables with appropriate columns and data types
+- Adds primary keys to all tables
+- Generates foreign keys for 1:N relationships
+- Creates junction tables for N:M relationships
+
+### 3. Data Type Inference
+- Attributes containing "price" → `DECIMAL(10, 2)`
+- All other attributes → `VARCHAR(255)`
+- Primary keys → `SERIAL PRIMARY KEY`
+- Foreign keys → `INTEGER REFERENCES`
+
+## Example Use Cases
+
+### E-commerce System
+```
+Input: "Customers have email and name. They place Orders with order_date. Orders contain Products with name, price, and description. Products belong to Categories with name."
+
+Output: Complete schema with customers, orders, products, categories tables and appropriate relationships.
+```
+
+### Blog Platform
+```
+Input: "Users write Posts with title and content. Posts have many Comments with text. Users can like many Posts."
+
+Output: Schema with users, posts, comments tables plus a user_post_likes junction table.
+```
+
+## Project Structure
+```
+ai-db-optimizer/
+├── main.py              # FastAPI application and core logic
+├── models.py            # Pydantic models for validation
+├── requirements.txt     # Python dependencies
+├── Dockerfile          # Container configuration
+├── docker-compose.yml  # Multi-container orchestration
+└── .env               # Environment variables (create this)
+```
+
+## Development
+
+### Running Locally
+```bash
+# Install dependencies
+pip install -r requirements.txt
+
+# Set environment variable
+export GOOGLE_API_KEY=your_key
+
+# Run the application
+uvicorn main:app --reload
+```
+
+### Adding New Features
+1. Extend the IR model in `models.py` for additional metadata
+2. Enhance the prompt in `parse_text_to_ir()` for better extraction
+3. Modify `generate_ddl_from_ir()` to support new SQL features
+
+## Troubleshooting
+
+### Common Issues
+- **503 Service Unavailable**: Check if GOOGLE_API_KEY is properly set
+- **JSON Parse Error**: The AI response may be malformed; try rephrasing the input
+- **Missing Relationships**: Be explicit about connections between entities
+
+### Debug Mode
+View container logs:
+```bash
+docker compose logs -f api
+```
+
+## Future Enhancements
+- Schema migration support
+- Index recommendation engine
+- Query generation from natural language
+- Support for multiple database dialects
+- Schema visualization
+- Data validation rules extraction
+
+## License
+This project is open source and available under the MIT License.
